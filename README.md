@@ -15,4 +15,16 @@ The mockchain is a single instance. It does not connect with other computers or 
 The mockchain runs on a single computer: your computer. Thus, the need to batch transactions together for efficiency is not required. When you submit a transaction to the mockchain, it is put into its own block and processed immediately. The blockchain component still works, but you'll find that each block just contains a single transaction. The cryptographic nature of the block headers connecting via linked hashes is not affected.
 
 #### Instant Feedback
-On a real blockchain, you have an asynchronous waiting period between submitting a transaction, it being processed, and the block being confirmed. On the mockchain, you get a synchronous response on the outcome of your transaction. This is good for testing purposes to understand if your transactions are properly formatted, if your smart contract is misbehaving, etc. It is also perfect for developing test suites against so that you can automatically test functionality against a system that performs pretty much identically to the actual production system. 
+On a real blockchain, you have an asynchronous waiting period between submitting a transaction, it being processed, and the block being confirmed. On the mockchain, you get a synchronous response on the outcome of your transaction. This is good for testing purposes to understand if your transactions are properly formatted, if your smart contract is misbehaving, etc. It is also perfect for developing test suites against so that you can automatically test functionality against a system that performs pretty much identically to the actual production system.
+
+## How
+
+```
+git clone https://github.com/Lamden/mockchain.git
+cd mockchain
+python3 -m mockchain
+``` 
+```
+python3 -m mockchain --port <INT> --vk <HEX_STRING>
+```
+
