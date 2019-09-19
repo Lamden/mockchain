@@ -19,7 +19,6 @@ class TestProcessor(TestCase):
         processor.mint(self.wallet.vk.encode().hex(), 1_000_000_000)
 
         self.currency = self.client.get_contract('currency')
-        print(self.currency.balance_of(account=self.wallet.vk.encode().hex()))
 
     def tearDown(self):
         self.client.flush()
