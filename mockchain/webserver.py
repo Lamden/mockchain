@@ -150,8 +150,8 @@ async def get_block(request):
 
 @app.route('/mint', methods=["POST"])
 async def mint_currency(request):
-    processor.mint(request.get('vk'), request.get('amount'))
-
+    processor.mint(request.json.get('vk'), request.json.get('amount'))
+    return json({'success': 'Mint success.'})
 
 def start_webserver(q):
     app.queue = q
