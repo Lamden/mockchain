@@ -8,6 +8,7 @@ from multiprocessing import Queue
 
 pyximport.install()
 
+
 @click.command()
 @click.option('--vk')
 @click.option('--port')
@@ -24,3 +25,7 @@ def boot(vk, port):
             'REQUEST_TIMEOUT': 5
         })
     webserver.start_webserver(Queue())
+
+
+if __name__ == '__main__':
+    boot()
