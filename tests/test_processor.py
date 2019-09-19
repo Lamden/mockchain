@@ -34,7 +34,12 @@ class TestProcessor(TestCase):
 
         tx_struct = transaction_capnp.Transaction.from_bytes_packed(tx)
 
-        print(processor.process_transaction(tx_struct))
+        results = processor.process_transaction(tx_struct)
+        balance = results['state_changes'].get('currency.balances:{}'.format(self.wallet.vk.encode().hex()))
+        balance_jeff = results['state_changes'].get('currency.balances:jeff')
+
+        self.assertEqual(float(balance), 1_000_000_000 - 10_000)
+        self.assertEqual(float(balance_jeff), 10_000)
 
     def test_mint_works(self):
         sync.sync_genesis_contracts(directory=os.path.dirname(contracts.__file__))
