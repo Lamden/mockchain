@@ -16,9 +16,12 @@ class TestProcessor(TestCase):
         self.wallet = Wallet()
         self.client = ContractingClient()
         sync.sync_genesis_contracts(directory=os.path.dirname(contracts.__file__))
-        processor.mint(self.wallet.vk.encode().hex(), 1_000_000_000)
 
+        processor.mint(self.wallet.vk.encode().hex(), 1_000_000_000)
         self.currency = self.client.get_contract('currency')
+
+        bal = self.currency.quick_read(variable='balances', key=self.wallet.vk.encode().hex())
+        self.assertEqual(bal, 1_000_000_000)
 
     def tearDown(self):
         self.client.flush()
@@ -40,7 +43,3 @@ class TestProcessor(TestCase):
 
         self.assertEqual(float(balance), 1_000_000_000 - 10_000)
         self.assertEqual(float(balance_jeff), 10_000)
-
-    def test_mint_works(self):
-        sync.sync_genesis_contracts(directory=os.path.dirname(contracts.__file__))
-        processor.mint(self.wallet.vk.encode().hex(), 100000)
