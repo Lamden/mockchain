@@ -120,8 +120,7 @@ def store_block(tx: transaction_capnp.Transaction, results, last_hash, last_num)
         'tx': b,
         'txHash': tx_hash,
         'blockHash': new_block_hash,
-        'blockNum': last_num,
-        'results': results
+        'blockNum': last_num
     }
 
     blocks.put(block)
