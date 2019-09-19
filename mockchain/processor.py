@@ -54,10 +54,13 @@ def process_transaction(tx: transaction_capnp.Transaction):
         kwargs=transaction.payload.kwargs,
         stamps=transaction.payload.stampsSupplied,
         environment=environment,
-        auto_commit=True
+        auto_commit=False
     )
 
+    state_changes = client.executor.driver.contract_modifications[0]
+
     return {
+        'state_changes': state_changes,
         'status_code': status_code,
         'result': result,
         'stamps_used': stamps_used

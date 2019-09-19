@@ -17,6 +17,8 @@ pyximport.install()
 @click.option('--vk')
 @click.option('--port')
 def boot(vk, port):
+    sync.sync_genesis_contracts(directory=os.path.dirname(contracts.__file__))
+
     if vk is not None:
         conf.HOST_VK = vk
 
