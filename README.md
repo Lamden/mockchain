@@ -28,3 +28,28 @@ python3 -m mockchain
 python3 -m mockchain --port <INT> --vk <HEX_STRING>
 ```
 
+## Usage
+
+Install Lampy and do the following:
+
+```python
+In [1]: from lampy import query
+
+In [2]: from lampy import wallet
+
+In [3]: wallet.Wallet()
+Out[3]: <lampy.wallet.Wallet at 0x108440828>
+
+In [4]: w = wallet.Wallet()
+
+In [5]: ip = 'http://127.0.0.1:8000'
+
+In [6]: c = query.LamdenClient(ip=ip, wallet=w)
+
+In [7]: c.ping()
+Out[7]: {'status': 'online'}
+
+In [8]: c.get_contracts()
+Out[8]: ['vkbook', 'currency', 'submission']
+
+```
