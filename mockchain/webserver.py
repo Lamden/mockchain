@@ -161,14 +161,4 @@ async def mint_currency(request):
 
 def start_webserver(q):
     app.queue = q
-    app.run(host='0.0.0.0', port=8000, workers=6, debug=False, access_log=False)
-
-
-if __name__ == '__main__':
-    import pyximport; pyximport.install()
-    if not app.config.REQUEST_MAX_SIZE:
-        app.config.update({
-            'REQUEST_MAX_SIZE': 5,
-            'REQUEST_TIMEOUT': 5
-        })
-    start_webserver(Queue())
+    app.run(host='0.0.0.0', port=8000, workers=1, debug=False, access_log=False)
