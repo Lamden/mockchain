@@ -1,3 +1,3 @@
 PORT = 8000
-HOST_VK = None
+HOST_VK = b'\x00' * 32
 EPOCH_INTERVAL = 100

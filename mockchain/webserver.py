@@ -43,7 +43,7 @@ async def get_nonce(_, vk):
         else:
             pending_nonce = nonce
 
-    return json({'nonce': pending_nonce, 'processor': VK.hex(), 'sender': vk})
+    return json({'nonce': pending_nonce, 'processor': conf.HOST_VK.hex(), 'sender': vk})
 
 
 @app.route('/epoch', methods=['GET'])
@@ -151,12 +151,7 @@ async def get_block(request):
 
 @app.route('/mint')
 async def mint_currency(request):
-    vk = request.get('vk')
-    amount = request.get('amount')
-
-    currency = client.get_contract('currency')
-
-    currency.balances[vk] += amount
+    processor.mint(request.get('vk'), request.get('amount'))
 
 
 def start_webserver(q):

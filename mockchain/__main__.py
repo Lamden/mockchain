@@ -1,8 +1,12 @@
+from cilantro_ee.contracts import sync
+
 import click
 import pyximport
+import os
 
 from . import conf
 from . import webserver
+from . import contracts
 
 from multiprocessing import Queue
 

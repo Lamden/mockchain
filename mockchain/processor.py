@@ -6,19 +6,19 @@ import os
 import capnp
 from contracting.stdlib.bridge.time import Datetime
 from contracting.client import ContractingClient
+from contracting.execution.executor import Executor
 
 from datetime import datetime
 from . import conf
 
 driver = MetaDataStorage()
-client = ContractingClient()
+client = ContractingClient(executor=Executor(metering=True))
 
 transaction_capnp = capnp.load(os.path.dirname(schemas.__file__) + '/transaction.capnp')
 
 
 def process_transaction(tx: transaction_capnp.Transaction):
     # Deserialize?
-
     if not transaction_is_valid(tx=tx,
                                 expected_processor=conf.HOST_VK,
                                 driver=driver,
@@ -48,7 +48,7 @@ def process_transaction(tx: transaction_capnp.Transaction):
     transaction = UnpackedContractTransaction(tx)
 
     status_code, result, stamps_used = client.executor.execute(
-        sender=transaction.payload.sender,
+        sender=transaction.payload.sender.hex(),
         contract_name=transaction.payload.contractName,
         function_name=transaction.payload.functionName,
         kwargs=transaction.payload.kwargs,
@@ -62,3 +62,9 @@ def process_transaction(tx: transaction_capnp.Transaction):
         'result': result,
         'stamps_used': stamps_used
     }
+
+
+def mint(vk, amount):
+    currency = client.get_contract('currency')
+    current_balance = currency.quick_read(variable='balances', key=vk) or 0
+    currency.quick_write(variable='balances', key=vk, value=amount+current_balance)
