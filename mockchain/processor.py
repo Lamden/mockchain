@@ -95,12 +95,12 @@ def process_transaction(tx: transaction_capnp.Transaction):
         'stamps_used': stamps_used
     }
 
-    store_block(tx, results, block_hash, block_num)
+    store_block(tx, block_hash, block_num)
 
     return results
 
 
-def store_block(tx: transaction_capnp.Transaction, results, last_hash, last_num):
+def store_block(tx: transaction_capnp.Transaction, last_hash, last_num):
     b = tx.as_builder().to_bytes_packed()
 
     h = hashlib.sha3_256()

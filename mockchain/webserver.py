@@ -5,7 +5,6 @@ from contracting.client import ContractingClient
 from cilantro_ee.storage.master import MasterStorage
 from cilantro_ee.storage.state import MetaDataStorage
 from cilantro_ee.messages import capnp as schemas
-from multiprocessing import Queue
 
 import ast
 from . import conf
@@ -149,7 +148,7 @@ async def get_block(request):
     return json(_json.dumps(block))
 
 
-@app.route('/mint')
+@app.route('/mint', methods=["POST"])
 async def mint_currency(request):
     processor.mint(request.get('vk'), request.get('amount'))
 
