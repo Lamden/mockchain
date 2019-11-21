@@ -2,9 +2,9 @@ from sanic import Sanic
 from sanic.response import json
 import json as _json
 from contracting.client import ContractingClient
-from cilantro_ee.storage.master import MasterStorage
-from cilantro_ee.storage.state import MetaDataStorage
-from cilantro_ee.messages import capnp as schemas
+from cilantro_ee.services.storage.master import MasterStorage
+from cilantro_ee.services.storage.state import MetaDataStorage
+from cilantro_ee.core.messages.capnp_impl import capnp_struct as schemas
 
 import ast
 from . import conf

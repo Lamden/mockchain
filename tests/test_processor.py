@@ -1,14 +1,14 @@
 from unittest import TestCase
 from mockchain import processor
-from lampy.wallet import Wallet
-from lampy.tx import build_transaction
-from cilantro_ee.messages import capnp as schemas
+from lamdenpy.wallet import Wallet
+from lamdenpy.tx import build_transaction
+from cilantro_ee.core.messages.capnp_impl import capnp_struct as capnp_schema
 from cilantro_ee.contracts import sync
 from mockchain import contracts
 import os
 import capnp
 from contracting.client import ContractingClient
-transaction_capnp = capnp.load(os.path.dirname(schemas.__file__) + '/transaction.capnp')
+transaction_capnp = capnp.load(os.path.dirname(capnp_schema.__file__) + '/transaction.capnp')
 
 
 class TestProcessor(TestCase):

@@ -1,11 +1,12 @@
-from cilantro_ee.protocol.transaction import transaction_is_valid, \
+from cilantro_ee.core.utils.transaction import transaction_is_valid, \
     TransactionNonceInvalid, TransactionProcessorInvalid, TransactionTooManyPendingException, \
     TransactionSenderTooFewStamps, TransactionPOWProofInvalid, TransactionSignatureInvalid, TransactionStampsNegative
 
-from cilantro_ee.storage.state import MetaDataStorage
-from cilantro_ee.storage.master import MasterStorage
+from cilantro_ee.services.storage.state import MetaDataStorage
+from cilantro_ee.core.nonces import NonceManager
+from cilantro_ee.services.storage.master import MasterStorage
 from cilantro_ee.nodes.delegate.sub_block_builder import UnpackedContractTransaction
-from cilantro_ee.messages import capnp as schemas
+from cilantro_ee.core.messages.capnp_impl import capnp_struct as schemas
 
 from contracting.stdlib.bridge.time import Datetime
 from contracting.client import ContractingClient
@@ -19,6 +20,7 @@ import hashlib
 from . import conf
 
 driver = MetaDataStorage()
+nonces = NonceManager()
 blocks = MasterStorage()
 client = ContractingClient(executor=Executor(metering=True))
 
@@ -36,7 +38,7 @@ def process_transaction(tx: transaction_capnp.Transaction):
     try:
         transaction_is_valid(tx=tx,
                              expected_processor=conf.HOST_VK,
-                             driver=driver,
+                             driver=nonces,
                              strict=True)
     except TransactionNonceInvalid:
         return {'error': 'Transaction nonce is invalid.'}
