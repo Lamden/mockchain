@@ -19,11 +19,29 @@ On a real blockchain, you have an asynchronous waiting period between submitting
 
 ## How
 
+### Install Dependencies
+*branch dependancies are subject to change
+
+[RocksDb](https://github.com/facebook/rocksdb)
+[PyMongo](https://github.com/mongodb/mongo-python-driver)
+[Lamden Cilantro Enterprise](https://github.com/Lamden/cilantro-enterprise) *branch rel_electric_egg
+[Lamden Contracting](https://github.com/Lamden/contracting)
+
+### Run Servers
+Start RockDB server
+Start MongoDB server
+
+### Install Mockchain
 ```
 git clone https://github.com/Lamden/mockchain.git
 cd mockchain
+```
+
+### Run Server
+```
 python3 -m mockchain
-``` 
+```
+specific port
 ```
 python3 -m mockchain --port <INT> --vk <HEX_STRING>
 ```
