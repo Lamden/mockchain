@@ -4,6 +4,7 @@ import json as _json
 from contracting.client import ContractingClient
 from cilantro_ee.services.storage.master import MasterStorage
 from cilantro_ee.services.storage.state import MetaDataStorage
+from cilantro_ee.core.nonces import NonceManager
 from cilantro_ee.core.messages.capnp_impl import capnp_struct as schemas
 
 import ast
@@ -16,11 +17,12 @@ app = Sanic(__name__)
 block_driver = MasterStorage()
 metadata_driver = MetaDataStorage()
 client = ContractingClient()
+nonces = NonceManager()
 
 transaction_capnp = capnp.load(os.path.dirname(schemas.__file__) + '/transaction.capnp')
 
 
-@app.route("/ping", methods=["GET","OPTIONS",])
+@app.route("/ping", methods=["GET", "OPTIONS"])
 async def ping(_):
     return json({'status': 'online'})
 
@@ -33,10 +35,10 @@ async def get_id(_):
 @app.route('/nonce/<vk>', methods=['GET'])
 async def get_nonce(_, vk):
     # Might have to change this sucker from hex to bytes.
-    pending_nonce = metadata_driver.get_pending_nonce(processor=conf.HOST_VK.hex(), sender=bytes.fromhex(vk))
+    pending_nonce = nonces.get_pending_nonce(processor=conf.HOST_VK.hex(), sender=bytes.fromhex(vk))
 
     if pending_nonce is None:
-        nonce = metadata_driver.get_nonce(processor=conf.HOST_VK.hex(), sender=bytes.fromhex(vk))
+        nonce = nonces.get_nonce(processor=conf.HOST_VK.hex(), sender=bytes.fromhex(vk))
         if nonce is None:
             pending_nonce = 0
         else:
