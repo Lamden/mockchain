@@ -38,7 +38,7 @@ async def get_nonce(_, vk):
     pending_nonce = nonces.get_pending_nonce(processor=conf.HOST_VK, sender=bytes.fromhex(vk))
 
     if pending_nonce is None:
-        nonce = nonces.get_nonce(processor=conf.HOST_VK.hex(), sender=bytes.fromhex(vk))
+        nonce = nonces.get_nonce(processor=conf.HOST_VK, sender=bytes.fromhex(vk))
         if nonce is None:
             pending_nonce = 0
         else:
