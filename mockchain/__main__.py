@@ -19,6 +19,9 @@ pyximport.install()
 def boot(vk, port):
     sync.sync_genesis_contracts(directory=os.path.dirname(contracts.__file__))
 
+    masternodes, delegates = sync.get_masternodes_and_delegates_from_constitution()
+    sync.submit_vkbook(masternodes, delegates)
+
     if vk is not None:
         conf.HOST_VK = vk
 

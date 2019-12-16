@@ -35,7 +35,11 @@ class TestProcessor(TestCase):
                                processor=b'\x00' * 32,
                                nonce=0)
 
+        print(tx)
+
         tx_struct = transaction_capnp.Transaction.from_bytes_packed(tx)
+
+        print(tx_struct)
 
         results = processor.process_transaction(tx_struct)
         balance = results['state_changes'].get('currency.balances:{}'.format(self.wallet.vk.encode().hex()))
