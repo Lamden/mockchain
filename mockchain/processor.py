@@ -99,6 +99,8 @@ def process_transaction(tx: transaction_capnp.Transaction):
 
     store_block(tx, block_hash, block_num)
 
+    nonces.commit_nonces()
+
     return results
 
 
