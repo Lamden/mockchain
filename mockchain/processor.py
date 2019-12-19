@@ -29,7 +29,9 @@ transaction_capnp = capnp.load(os.path.dirname(schemas.__file__) + '/transaction
 
 def mint(vk, amount):
     currency = client.get_contract('currency')
-    current_balance = currency.quick_read(variable='balances', key=vk) or 0
+    current_balance = currency.quick_read(variable='balances', key=vk)
+    if current_balance is None: 
+        current_balance = 0
     currency.quick_write(variable='balances', key=vk, value=amount+current_balance)
 
 
@@ -100,8 +102,8 @@ def process_transaction(tx: transaction_capnp.Transaction):
     store_block(tx, block_hash, block_num)
 
     nonces.commit_nonces()
-
-    return results
+    
+        return results
 
 
 def store_block(tx: transaction_capnp.Transaction, last_hash, last_num):

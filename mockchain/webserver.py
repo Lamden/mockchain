@@ -1,7 +1,11 @@
 from sanic import Sanic
 from sanic.response import json
+
 import json as _json
+
 from contracting.client import ContractingClient
+from contracting.db.encoder import encode
+
 from cilantro_ee.services.storage.master import MasterStorage
 from cilantro_ee.services.storage.state import MetaDataStorage
 from cilantro_ee.core.nonces import NonceManager
@@ -69,7 +73,7 @@ async def submit_transaction(request):
         return json({'error': 'Malformed transaction.'.format(e)}, status=400)
 
     result = processor.process_transaction(tx)
-    return result
+    return json(result)
 
 
 # Returns {'contracts': JSON List of strings}
@@ -118,8 +122,8 @@ async def get_variable(request, contract, variable):
 
     key = request.args.get('key')
 
-    contract = client.get_contract(contract)
-    response = contract.quick_read(variable=variable, key=key) or None
+    k = client.raw_driver.make_key(key=contract, field=variable, args=[key])
+    response = encode(client.raw_driver.get(k))
 
     if response is None:
         return json({'value': None}, status=404)
