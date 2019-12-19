@@ -118,8 +118,8 @@ async def get_variable(request, contract, variable):
 
     key = request.args.get('key')
 
-    k = client.raw_driver.make_key(key=contract, field=variable, args=key)
-    response = client.raw_driver.get(k)
+    contract = client.get_contract(contract)
+    response = contract.quick_read(variable=variable, key=key) or None
 
     if response is None:
         return json({'value': None}, status=404)

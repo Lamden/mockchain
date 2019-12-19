@@ -1,10 +1,17 @@
 from cilantro_ee.contracts import sync
+from cilantro_ee.contracts.sync import seed_vkbook
 
 import click
 import pyximport
 import os
 
 from . import conf
+
+#Set your CONSTITUTION_FILE name in ./conf.py
+#Your constitution file should be located in the cilantro-enterprise/constitutions/public/ directory
+#of your cilantro-enterprise install.
+seed_vkbook(conf.CONSTITUTION_FILE)
+
 from . import webserver
 from . import contracts
 
@@ -18,9 +25,6 @@ pyximport.install()
 @click.option('--port')
 def boot(vk, port):
     sync.sync_genesis_contracts(directory=os.path.dirname(contracts.__file__))
-
-    masternodes, delegates = sync.get_masternodes_and_delegates_from_constitution()
-    sync.submit_vkbook(masternodes, delegates)
 
     if vk is not None:
         conf.HOST_VK = vk
