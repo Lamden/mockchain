@@ -159,6 +159,23 @@ async def mint_currency(request):
     processor.mint(request.json.get('vk'), request.json.get('amount'))
     return json({'success': 'Mint success.'})
 
+# Expects json object such that:
+'''
+{
+    'name': 'string',
+    'code': 'string'
+}
+'''
+@app.route('/lint', methods=['POST'])
+async def lint_contract(request):
+    code = request.json.get('code')
+
+    if code is None:
+        return json({'error': 'no code provided'}, status=200)
+
+    violations = client.lint(request.json.get('code'))
+    return json({'violations': violations}, status=200)
+
 def start_webserver(q):
     app.queue = q
     app.run(host='0.0.0.0', port=8000, workers=1, debug=False, access_log=False)
