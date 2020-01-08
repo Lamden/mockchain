@@ -159,6 +159,28 @@ async def mint_currency(request):
     processor.mint(request.json.get('vk'), request.json.get('amount'))
     return json({'success': 'Mint success.'})
 
+
+@app.route('/iterate', methods=['GET'])
+async def iterate_variable(request, contract, variable):
+    contract_code = client.raw_driver.get_contract(contract)
+
+    if contract_code is None:
+        return json({'error': '{} does not exist'.format(contract)}, status=404)
+
+    key = request.args.get('key')
+    if key is not None:
+        key = key.split(',')
+
+    k = client.raw_driver.make_key(key=contract, field=variable, args=key)
+
+    values = client.raw_driver.iter(k, length=500)
+
+    if len(values) == 0:
+        return json({'values': None}, status=404)
+    return json({'values': values, 'next': values[-1][0]}, status=200)
+
+
 def start_webserver(q):
     app.queue = q
     app.run(host='0.0.0.0', port=8000, workers=1, debug=False, access_log=False)
+
