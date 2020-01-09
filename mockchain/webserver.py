@@ -6,10 +6,10 @@ import json as _json
 from contracting.client import ContractingClient
 from contracting.db.encoder import encode
 
-from cilantro_ee.services.storage.master import MasterStorage
-from cilantro_ee.services.storage.state import MetaDataStorage
+from cilantro_ee.storage.master import MasterStorage
+from cilantro_ee.storage.state import MetaDataStorage
 from cilantro_ee.core.nonces import NonceManager
-from cilantro_ee.core.messages.capnp_impl import capnp_struct as schemas
+from cilantro_ee.messages.capnp_impl import capnp_struct as schemas
 
 import ast
 from . import conf
