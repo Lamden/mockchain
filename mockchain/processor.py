@@ -2,16 +2,13 @@ from cilantro_ee.crypto.transaction import transaction_is_valid, \
     TransactionNonceInvalid, TransactionProcessorInvalid, TransactionTooManyPendingException, \
     TransactionSenderTooFewStamps, TransactionPOWProofInvalid, TransactionSignatureInvalid, TransactionStampsNegative
 
-from cilantro_ee.storage.state import MetaDataStorage
-from cilantro_ee.core.nonces import NonceManager
+from cilantro_ee.storage import BlockchainDriver
 from cilantro_ee.storage.master import MasterStorage
 from cilantro_ee.nodes.delegate import execution
-from cilantro_ee.nodes.delegate.sub_block_builder import UnpackedContractTransaction
 from cilantro_ee.messages.capnp_impl import capnp_struct as schemas
 
 from contracting.stdlib.bridge.time import Datetime
 from contracting.client import ContractingClient
-from contracting.execution.executor import Executor
 
 from datetime import datetime
 import os
@@ -20,10 +17,9 @@ import hashlib
 
 from . import conf
 
-driver = MetaDataStorage()
-nonces = NonceManager()
+driver = BlockchainDriver()
 blocks = MasterStorage()
-client = ContractingClient(executor=Executor(metering=True))
+client = ContractingClient(metering=True)
 
 transaction_capnp = capnp.load(os.path.dirname(schemas.__file__) + '/transaction.capnp')
 
@@ -41,7 +37,7 @@ def process_transaction(tx: transaction_capnp.Transaction):
     try:
         transaction_is_valid(tx=tx,
                              expected_processor=conf.HOST_VK,
-                             driver=nonces,
+                             driver=driver,
                              strict=True)
     except TransactionNonceInvalid:
         return {'error': 'Transaction nonce is invalid.'}
@@ -77,27 +73,14 @@ def process_transaction(tx: transaction_capnp.Transaction):
         'now': dt_object
     }
 
-    transaction = UnpackedContractTransaction(tx)
-
-    status_code, result, stamps_used = client.executor.execute(
-        sender=transaction.payload.sender.hex(),
-        contract_name=transaction.payload.contractName,
-        function_name=transaction.payload.functionName,
-        kwargs=transaction.payload.kwargs,
-        stamps=transaction.payload.stampsSupplied,
-        environment=environment,
-        auto_commit=False
-    )
-
-    state_changes = client.executor.driver.contract_modifications[0]
+    tx_output = execution.execute_tx(executor=client.executor, transaction=tx, environment=environment)
 
     client.executor.driver.commit()
 
     results = {
-        'state_changes': state_changes,
-        'status_code': status_code,
-        'result': result,
-        'stamps_used': stamps_used
+        'state_changes': tx_output.state,
+        'status_code': tx_output.status,
+        'stamps_used': tx_output.stampsUsed
     }
 
     store_block(tx, block_hash, block_num)
