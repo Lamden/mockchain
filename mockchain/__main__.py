@@ -1,5 +1,6 @@
+from contracting.client import ContractingClient
 from cilantro_ee.contracts import sync
-from cilantro_ee.contracts.sync import seed_vkbook
+import cilantro_ee
 
 import click
 import pyximport
@@ -24,7 +25,7 @@ pyximport.install()
 @click.option('--vk')
 @click.option('--port')
 def boot(vk, port):
-    sync.sync_genesis_contracts(directory=os.path.dirname(contracts.__file__))
+    sync.submit_from_genesis_json_file(cilantro_ee.contracts.__path__[0] + '/genesis.json', client=ContractingClient())
 
     if vk is not None:
         conf.HOST_VK = vk
