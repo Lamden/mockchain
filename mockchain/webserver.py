@@ -122,7 +122,12 @@ async def get_variable(request, contract, variable):
 
     key = request.args.get('key')
 
-    k = client.raw_driver.make_key(key=contract, field=variable, args=[key])
+    if key is None:
+        args = []
+    else:
+        args = [key]
+
+    k = client.raw_driver.make_key(key=contract, field=variable, args=args)
     response = encode(client.raw_driver.get(k))
 
     if response is None:
