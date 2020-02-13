@@ -11,7 +11,6 @@ from . import conf
 #Set your CONSTITUTION_FILE name in ./conf.py
 #Your constitution file should be located in the cilantro-enterprise/constitutions/public/ directory
 #of your cilantro-enterprise install.
-seed_vkbook(conf.CONSTITUTION_FILE)
 
 from . import webserver
 from . import contracts
