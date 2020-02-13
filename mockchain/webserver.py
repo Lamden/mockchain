@@ -7,8 +7,7 @@ from contracting.client import ContractingClient
 from contracting.db.encoder import encode
 
 from cilantro_ee.storage.master import MasterStorage
-from cilantro_ee.storage.state import MetaDataStorage
-from cilantro_ee.core.nonces import NonceManager
+from cilantro_ee.storage import BlockchainDriver
 from cilantro_ee.messages.capnp_impl import capnp_struct as schemas
 
 import ast
@@ -19,9 +18,8 @@ import capnp
 
 app = Sanic(__name__)
 block_driver = MasterStorage()
-metadata_driver = MetaDataStorage()
+metadata_driver = BlockchainDriver()
 client = ContractingClient()
-nonces = NonceManager()
 
 transaction_capnp = capnp.load(os.path.dirname(schemas.__file__) + '/transaction.capnp')
 
@@ -39,28 +37,16 @@ async def get_id(_):
 @app.route('/nonce/<vk>', methods=['GET'])
 async def get_nonce(_, vk):
     # Might have to change this sucker from hex to bytes.
-    pending_nonce = nonces.get_pending_nonce(processor=conf.HOST_VK, sender=bytes.fromhex(vk))
+    pending_nonce = metadata_driver.get_pending_nonce(processor=conf.HOST_VK, sender=bytes.fromhex(vk))
 
     if pending_nonce is None:
-        nonce = nonces.get_nonce(processor=conf.HOST_VK, sender=bytes.fromhex(vk))
+        nonce = metadata_driver.get_nonce(processor=conf.HOST_VK, sender=bytes.fromhex(vk))
         if nonce is None:
             pending_nonce = 0
         else:
             pending_nonce = nonce
 
     return json({'nonce': pending_nonce, 'processor': conf.HOST_VK.hex(), 'sender': vk})
-
-
-@app.route('/epoch', methods=['GET'])
-async def get_epoch(_):
-    epoch_hash = metadata_driver.latest_epoch_hash
-    block_num = metadata_driver.latest_block_num
-
-    e = (block_num // conf.EPOCH_INTERVAL) + 1
-    blocks_until_next_epoch = (e * conf.EPOCH_INTERVAL) - block_num
-
-    return json({'epoch_hash': epoch_hash.hex(),
-                 'blocks_until_next_epoch': blocks_until_next_epoch})
 
 
 @app.route("/", methods=["POST","OPTIONS",])
