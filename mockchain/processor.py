@@ -85,8 +85,8 @@ def process_transaction(tx: transaction_capnp.Transaction):
 
     store_block(tx, block_hash, block_num)
 
-    nonces.commit_nonces()
-    nonces.delete_pending_nonces()
+    driver.commit_nonces()
+    driver.delete_pending_nonces()
 
     return results
 
