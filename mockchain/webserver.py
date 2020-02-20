@@ -53,7 +53,7 @@ async def get_nonce(_, vk):
 async def submit_transaction(request):
     try:
         tx_bytes = request.body
-        tx = transaction_capnp.Transaction.from_bytes_packed(tx_bytes)
+        tx = transaction_capnp.NewTransaction.from_bytes_packed(tx_bytes)
 
     except Exception as e:
         return json({'error': 'Malformed transaction.'.format(e)}, status=400)
