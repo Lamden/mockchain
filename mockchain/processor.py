@@ -14,6 +14,7 @@ from datetime import datetime
 import os
 import capnp
 import hashlib
+import json
 
 from . import conf
 
@@ -77,16 +78,19 @@ def process_transaction(tx: transaction_capnp.Transaction):
 
     client.executor.driver.commit()
 
-    results = {
-        'state_changes': tx_output.state,
-        'status_code': tx_output.status,
-        'stamps_used': tx_output.stampsUsed
-    }
-
     store_block(tx, block_hash, block_num)
 
     driver.commit_nonces()
     driver.delete_pending_nonces()
+
+    tx_dict = tx_output.to_dict()
+    state_changes = [ {i['key'].decode("utf-8"): i['value'].decode("utf-8")} for i in tx_dict['state'] ]
+
+    results = {
+        'state_changes': state_changes,
+        'status_code': tx_output.status,
+        'stamps_used': tx_output.stampsUsed
+    }
 
     return results
 

@@ -21,6 +21,17 @@ block_driver = MasterStorage()
 metadata_driver = BlockchainDriver()
 client = ContractingClient()
 
+#HTTPS
+'''
+from sanic_cors import CORS, cross_origin
+import ssl
+SSL_WEB_SERVER_PORT = 443
+NUM_WORKERS = 1
+ssl_cert = ''
+ssl_key = ''
+CORS(app, automatic_options=True)
+'''
+
 transaction_capnp = capnp.load(os.path.dirname(schemas.__file__) + '/transaction.capnp')
 
 
@@ -59,7 +70,8 @@ async def submit_transaction(request):
         return json({'error': 'Malformed transaction.'.format(e)}, status=400)
 
     result = processor.process_transaction(tx)
-    return json(result)
+
+    return json(result, status=200)
 
 
 # Returns {'contracts': JSON List of strings}
@@ -113,7 +125,7 @@ async def get_variable(request, contract, variable):
     else:
         args = [key]
 
-    k = client.raw_driver.make_key(key=contract, field=variable, args=args)
+    k = client.raw_driver.make_key(contract, variable, args)
     response = encode(client.raw_driver.get(k))
 
     if response is None:
@@ -122,31 +134,38 @@ async def get_variable(request, contract, variable):
         return json({'value': response}, status=200)
 
 
-@app.route("/latest_block", methods=["GET","OPTIONS",])
-async def get_latest_block(_):
+@app.route("/latest_blocks", methods=["GET","OPTIONS",])
+async def get_latest_blocks(request):
+    num = request.args.get('num')
+    if num is None:
+        num = 1
     index = block_driver.get_last_n(1)
-    latest_block_hash = index.get('blockHash')
-    return json({'hash': '{}'.format(latest_block_hash) })
+    return json(index[0])
 
 
 @app.route('/blocks', methods=["GET","OPTIONS",])
 async def get_block(request):
-    if 'number' in request.json:
-        num = request.json['number']
+    num = request.args.get('num')
+    if num:
+        print(num)
         block = block_driver.get_block(num)
+        print (block)
         if block is None:
             return json({'error': 'Block at number {} does not exist.'.format(num)}, status=400)
-    else:
-        _hash = request.json['hash']
+
+    _hash = request.args.get('hash')
+    if _hash:
         block = block_driver.get_block(_hash)
         if block is None:
             return json({'error': 'Block with hash {} does not exist.'.format(_hash)}, 400)
 
-    return json(_json.dumps(block))
+    return json(block)
 
 
-@app.route('/mint', methods=["POST"])
+@app.route('/mint', methods=["POST","OPTIONS"])
 async def mint_currency(request):
+    vk = request.json.get('vk')
+    amount = request.json.get('amount')
     processor.mint(request.json.get('vk'), request.json.get('amount'))
     return json({'success': 'Mint success.'})
 
@@ -171,7 +190,32 @@ async def iterate_variable(request, contract, variable):
     return json({'values': values, 'next': values[-1][0]}, status=200)
 
 
+# Expects json object such that:
+'''
+{
+    'name': 'string',
+    'code': 'string'
+}
+'''
+@app.route('/lint', methods=['POST','OPTIONS'])
+async def lint_contract(request):
+    code = request.json.get('code')
+
+    if code is None:
+        return json({'error': 'no code provided'}, status=200)
+
+    try:
+        violations = client.lint(request.json.get('code'))
+    except Exception as e:
+        violations = e
+
+    return json({'violations': violations}, status=200)
+
+
 def start_webserver(q):
     app.queue = q
+    context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+    context.load_cert_chain(ssl_cert, keyfile=ssl_key)
+    #app.run(host='0.0.0.0', port=SSL_WEB_SERVER_PORT, workers=NUM_WORKERS, debug=True, access_log=False, ssl=context)
     app.run(host='0.0.0.0', port=8000, workers=1, debug=False, access_log=False)
 
