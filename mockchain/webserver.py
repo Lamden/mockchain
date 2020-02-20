@@ -37,12 +37,12 @@ transaction_capnp = capnp.load(os.path.dirname(schemas.__file__) + '/transaction
 
 @app.route("/ping", methods=["GET", "OPTIONS"])
 async def ping(_):
-    return json({'status': 'online'})
+    return json({'status': 'online'}, status=200)
 
 
 @app.route('/id', methods=['GET'])
 async def get_id(_):
-    return json({'verifying_key': conf.HOST_VK.hex()})
+    return json({'verifying_key': conf.HOST_VK.hex()}, status=200)
 
 
 @app.route('/nonce/<vk>', methods=['GET'])
@@ -57,7 +57,7 @@ async def get_nonce(_, vk):
         else:
             pending_nonce = nonce
 
-    return json({'nonce': pending_nonce, 'processor': conf.HOST_VK.hex(), 'sender': vk})
+    return json({'nonce': pending_nonce, 'processor': conf.HOST_VK.hex(), 'sender': vk}, status=200)
 
 
 @app.route("/", methods=["POST","OPTIONS",])
@@ -78,7 +78,7 @@ async def submit_transaction(request):
 @app.route('/contracts', methods=['GET'])
 async def get_contracts(_):
     contracts = client.get_contracts()
-    return json({'contracts': contracts})
+    return json({'contracts': contracts}, status=200)
 
 
 @app.route('/contracts/<contract>', methods=['GET'])
@@ -140,7 +140,7 @@ async def get_latest_blocks(request):
     if num is None:
         num = 1
     index = block_driver.get_last_n(1)
-    return json(index[0])
+    return json(index[0], status=200)
 
 
 @app.route('/blocks', methods=["GET","OPTIONS",])
@@ -159,7 +159,7 @@ async def get_block(request):
         if block is None:
             return json({'error': 'Block with hash {} does not exist.'.format(_hash)}, 400)
 
-    return json(block)
+    return json(block, status=200)
 
 
 @app.route('/mint', methods=["POST","OPTIONS"])
@@ -167,7 +167,7 @@ async def mint_currency(request):
     vk = request.json.get('vk')
     amount = request.json.get('amount')
     processor.mint(request.json.get('vk'), request.json.get('amount'))
-    return json({'success': 'Mint success.'})
+    return json({'success': 'Mint success.'}, status=200)
 
 
 @app.route('/iterate', methods=['GET'])
@@ -190,13 +190,6 @@ async def iterate_variable(request, contract, variable):
     return json({'values': values, 'next': values[-1][0]}, status=200)
 
 
-# Expects json object such that:
-'''
-{
-    'name': 'string',
-    'code': 'string'
-}
-'''
 @app.route('/lint', methods=['POST','OPTIONS'])
 async def lint_contract(request):
     code = request.json.get('code')
@@ -214,8 +207,13 @@ async def lint_contract(request):
 
 def start_webserver(q):
     app.queue = q
-    context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
-    context.load_cert_chain(ssl_cert, keyfile=ssl_key)
-    #app.run(host='0.0.0.0', port=SSL_WEB_SERVER_PORT, workers=NUM_WORKERS, debug=True, access_log=False, ssl=context)
+
+    #HTTP
     app.run(host='0.0.0.0', port=8000, workers=1, debug=False, access_log=False)
 
+    #HTTPS
+    '''
+    #context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+    #context.load_cert_chain(ssl_cert, keyfile=ssl_key)
+    #app.run(host='0.0.0.0', port=SSL_WEB_SERVER_PORT, workers=NUM_WORKERS, debug=True, access_log=False, ssl=context)
+    '''

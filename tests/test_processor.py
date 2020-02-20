@@ -37,7 +37,7 @@ class TestProcessor(TestCase):
 
         print(tx)
 
-        tx_struct = transaction_capnp.Transaction.from_bytes_packed(tx)
+        tx_struct = transaction_capnp.NewTransaction.from_bytes_packed(tx)
 
         print(tx_struct)
 
