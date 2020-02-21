@@ -85,11 +85,9 @@ def process_transaction(tx: transaction_capnp.Transaction):
 
     tx_dict = tx_output.to_dict()
 
+    state_changes = {}
     for item in tx_dict['state']:
         state_changes[item['key'].decode("utf-8")] = item['value'].decode("utf-8")
-
-    if state_changes is None:
-        state_changes = {}
 
     results = {
         'state_changes': state_changes,
