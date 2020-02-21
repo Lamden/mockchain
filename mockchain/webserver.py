@@ -215,5 +215,5 @@ def start_webserver(q):
     '''
     #context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
     #context.load_cert_chain(ssl_cert, keyfile=ssl_key)
-    #app.run(host='0.0.0.0', port=SSL_WEB_SERVER_PORT, workers=NUM_WORKERS, debug=True, access_log=False, ssl=context)
+    #app.run(host='0.0.0.0', port=SSL_WEB_SERVER_PORT, workers=NUM_WORKERS, debug=False, access_log=False, ssl=context)
     '''
