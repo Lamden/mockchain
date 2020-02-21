@@ -46,21 +46,8 @@ class TestProcessor(TestCase):
 
         results = processor.process_transaction(tx)
 
-        for obj in results['state_changes']:
-            for key in obj:
-                if key == "currency.balances:jeff":
-                    balance_jeff = obj[key]
-                    break
-                else:
-                    balance_jeff = None
-
-        for obj in results['state_changes']:
-            for key in obj:
-                if key == 'currency.balances:{}'.format(self.wallet.vk.encode().hex()):
-                    balance_from = obj[key]
-                    return
-                else:
-                    balance_from = None
+        balance_from = results['state_changes']['currency.balances:{}'.format(self.wallet.vk.encode().hex())]
+        balance_jeff = results['state_changes']['currency.balances:jeff']
 
         self.assertEqual(float(balance_from), 1000000000 - 10000)
         self.assertEqual(float(balance_jeff), 10000)
