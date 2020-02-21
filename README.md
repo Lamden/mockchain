@@ -26,16 +26,20 @@ branch dependancies are subject to change*
 
 [PyMongo](https://github.com/mongodb/mongo-python-driver)
 
-[Lamden Cilantro Enterprise](https://github.com/Lamden/cilantro-enterprise) *branch rel_electric_egg
+[Lamden Cilantro Enterprise](https://github.com/Lamden/cilantro-enterprise) *branch rel_gov_debug
 
-[Lamden Contracting](https://github.com/Lamden/contracting)
+[Lamden Contracting](https://github.com/Lamden/contracting) #branch dev
 
 
 
 ### Run Servers
-Start RockDB and MongoDB servers
-
-
+Start RockDB
+linux:
+```
+ rocks serve & and MongoDB () servers
+```
+Start MongoDB
+[Check OS specific instructions MongoDB](https://docs.mongodb.com/manual/installation/#mongodb-community-edition-installation-tutorials)
 ### Install Mockchain
 ```
 git clone https://github.com/Lamden/mockchain.git
